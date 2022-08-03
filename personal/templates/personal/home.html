@@ -1,0 +1,27 @@
+{% extends 'chat_base.html' %}
+
+{% block content %}
+<div class="container">
+
+	<!-- MEDIUM+ SCREENS -->
+	<div class="main d-none d-md-flex flex-column">
+		<div class="card p-4 align-items-start">
+
+			<h3 class="pb-4">Welcome to Starworld.</h3>
+		</div> 
+
+		{% include 'public_chat/public_chat_room.html' with room_id=room_id %}
+
+
+	</div>
+	<!-- END MEDIUM+ SCREENS -->
+	
+	<!-- SMALL SCREENS -->
+	<div class="d-flex d-md-none p-2">
+		
+	</div>
+	<!-- END SMALL SCREENS -->
+</div>
+
+
+{% endblock %}
