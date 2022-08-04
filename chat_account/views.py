@@ -1,3 +1,4 @@
+import imp
 from django.conf import settings
 from django.shortcuts import render,redirect
 from django.http import HttpResponse
@@ -8,6 +9,7 @@ from friend.utils import get_friend_request_or_false
 from friend.friend_request_status import FriendRequestStatus
 
 from accounts.models import Account
+from django.db.models import Q
 # from accounts.forms import AccountUpdateForm
 
 
@@ -86,15 +88,22 @@ def account_search_view(request, *args, **kwargs):
 	if request.method == "GET":
 		search_query = request.GET.get("q")
 		if len(search_query) > 0:
-			search_results = Account.objects.filter(email__icontains=search_query).filter(username__icontains=search_query).distinct()
+			print('skldfjasdfkjklasjdf')
+			print(search_query)
+			search_results = Account.objects.filter(Q(username__icontains=search_query))
+			print(search_results)
 			user = request.user
 			accounts = [] # [(account1, True), (account2, False), ...]
 			if user.is_authenticated:
 				# get the authenticated users friend list
-				auth_user_friend_list = FriendList.objects.get(user=user)
-				for account in search_results:
-					accounts.append((account, auth_user_friend_list.is_mutual_friend(account)))
-				context['accounts'] = accounts
+				try:
+					auth_user_friend_list = FriendList.objects.get(user=user)
+					for account in search_results:
+						accounts.append((account, auth_user_friend_list.is_mutual_friend(account)))
+					context['accounts'] = accounts
+
+				except:
+					pass
 			else:
 				for account in search_results:
 					accounts.append((account, False))

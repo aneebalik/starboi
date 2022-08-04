@@ -12,11 +12,13 @@ from django.utils.http import urlsafe_base64_encode,urlsafe_base64_decode
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_bytes
 from django.core.mail import EmailMessage
+from django.shortcuts import get_object_or_404
+from accounts.forms import UserForm,UserProfileForm
 
 from carts.views import _cart_id
 from carts.models import Cart,CartItem
 from orders.models import Order, OrderProduct
-from accounts.models import Account
+from accounts.models import Account,UserProfile
 
 # import requests
 
@@ -52,7 +54,7 @@ def register(request):
             to_email = email
             send_email = EmailMessage(mail_subject, message, to =[to_email])
             send_email.send()
-            # messages.success(request, 'Thankyou for registering with us. Verification mail has been sent to the registered mail.')
+            messages.success(request, 'Thankyou for registering with us. Verification mail has been sent to the registered mail.')
             return redirect('/accounts/login/?command=verification&email='+email)
 
     else:
@@ -246,27 +248,27 @@ def my_orders(request):
     return render(request, 'accounts/my_orders.html',context)
 
 
-# @login_required(login_url='login')
-# def edit_profile(request):
-#     userprofile = get_object_or_404(UserProfile,user=request.user)
-#     if request.method == "POST":
-#         user_form = UserForm(request.POST, instance=request.user)
-#         profile_form = UserProfileForm(request.POST, request.FILES, instance=userprofile)
-#         if user_form.is_valid() and profile_form.is_valid():
-#             user_form.save()
-#             profile_form.save()
-#             messages.success(request,'Profile edited succesfully')
-#             return redirect('edit_profile')
-#     else:
-#         user_form =UserForm(instance=request.user)
-#         profile_form = UserProfileForm(instance=userprofile)
+@login_required(login_url='login')
+def edit_profile(request):
+    userprofile = get_object_or_404(UserProfile,user=request.user)
+    if request.method == "POST":
+        user_form = UserForm(request.POST, instance=request.user)
+        profile_form = UserProfileForm(request.POST, request.FILES, instance=userprofile)
+        if user_form.is_valid() and profile_form.is_valid():
+            user_form.save()
+            profile_form.save()
+            messages.success(request,'Profile edited succesfully')
+            return redirect('edit_profile')
+    else:
+        user_form =UserForm(instance=request.user)
+        profile_form = UserProfileForm(instance=userprofile)
 
-#     context = {
-#         'user_form': user_form,
-#         'profile_form': profile_form,
-#         'userprofile': userprofile,
-#     }
-#     return render(request,'accounts/edit_profile.html',context) 
+    context = {
+        'user_form': user_form,
+        'profile_form': profile_form,
+        'userprofile': userprofile,
+    }
+    return render(request,'accounts/edit_profile.html',context) 
 
 @login_required(login_url='login')
 def change_password(request):
