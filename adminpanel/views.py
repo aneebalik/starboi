@@ -26,13 +26,19 @@ def admin_dashboard(request):
 @login_required(login_url="login")
 def admin_dashboard(request):
     if request.user.is_superadmin:
-        total_revenue = round( Order.objects.filter(is_ordered = True).aggregate(sum = Sum('order_total'))['sum'])
+        try:
+            total_revenue = round( Order.objects.filter(is_ordered = True).aggregate(sum = Sum('order_total'))['sum'])
 
-        total_cost= round((total_revenue * .80))
-        total_profit = round(total_revenue - total_cost)  
-        
-        product_count = OrderProduct.objects.all().count()
-       
+            total_cost= round((total_revenue * .80))
+            total_profit = round(total_revenue - total_cost)  
+            
+            product_count = OrderProduct.objects.all().count()
+        except:
+            total_cost = 0
+            total_profit = 0 
+            total_revenue = 0 
+            product_count = 0
+
         context = {
             'total_revenue' : total_revenue,
             'total_cost' : total_cost,
@@ -42,10 +48,6 @@ def admin_dashboard(request):
         return render (request,'adminpanel/admin_dashboard.html',context)
     else:
         return redirect('home')
-
-
-
-
 
 
 def accounts_table(request,id):
